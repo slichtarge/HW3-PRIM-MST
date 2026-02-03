@@ -94,5 +94,5 @@ def test_mst_student():
     file_path = './data/disconnected.csv'
     g = Graph(file_path)
     g.construct_mst()
-    with pytest.raises(ValueError, match="disconnected"):
+    with pytest.raises(AssertionError, match="MST is disconnected into"):
         check_mst(g.adj_mat, g.mst, 1)

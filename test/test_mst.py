@@ -34,7 +34,8 @@ def check_mst(adj_mat: np.ndarray,
     assert n_components == 1, f'MST is disconnected into {n_components} components'
 
     #not symmetric
-    assert np.all(mst == mst.T), 'Proposed MST adjacency matrix is not symmetric'
+    #doing allclose instead of all because of precision issues with floats
+    assert np.allclose(mst == mst.T), 'Proposed MST adjacency matrix is not symmetric'
 
     #num edges not valid (not n_vertices - 1)
     num_vertices = len(adj_mat)

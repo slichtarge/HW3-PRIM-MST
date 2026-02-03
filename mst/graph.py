@@ -41,4 +41,47 @@ class Graph:
         `heapify`, `heappop`, and `heappush` functions.
 
         """
-        self.mst = None
+        num_vertices =len(self.adj_mat)
+
+        #initializing
+        in_mst = [False] * num_vertices
+        weights = [float("inf")] * num_vertices     #min weight edge to reach each vertex
+        predecessors = [None] * num_vertices
+        
+        
+        s_idx = 0  #starting from the 0th vertex
+        weights[s_idx] = 0  #the cost to reach the first index is 0 :)
+        
+        final_mst = np.zeros((num_vertices, num_vertices))      #initialize adj matrix to all 0's
+
+        pq = [(weights[v], v) for v in range(num_vertices)]     #make priority queue (weight then vertex bc it sorts by first element)
+        heapq.heapify(pq)
+
+        # While priority queue has vertices
+        while pq:
+            u_weight, u = heapq.heappop(pq)  # Pop the vertex with minimum weight
+
+            #if it's in the mst, skip it
+            if in_mst[u]:
+                continue
+            
+            in_mst[u] = True    # add vertex u to MST
+            
+            # add edge to mst (if not the starting vertex)
+            if predecessors[u] is not None:
+                pred = predecessors[u]
+                final_mst[u][pred] = self.adj_mat[u][pred]
+                final_mst[pred][u] = self.adj_mat[pred][u]  #it's symmetric so add both ways
+            
+            # update neighbors of u
+            for v in range(num_vertices):
+                edge_weight = self.adj_mat[u][v]
+                
+                # if edge exists AND v is not in mst AND this edge is better
+                if edge_weight > 0 and not in_mst[v] and edge_weight < weights[v]:
+                    weights[v] = edge_weight
+                    predecessors[v] = u
+                    heapq.heappush(pq, (weights[v], v))
+
+        # update the actual mst!!
+        self.mst = final_mst

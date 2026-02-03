@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 from mst import Graph
 from sklearn.metrics import pairwise_distances
+from scipy.sparse.csgraph import connected_components
 
 
 def check_mst(adj_mat: np.ndarray, 
@@ -25,7 +26,23 @@ def check_mst(adj_mat: np.ndarray,
     always connected? What else can you think of?
 
     """
+    
+    ##MY ADDED ASSERTIONS
 
+    #mst not fully connected
+    n_components, _ = connected_components(mst, directed=False)
+    assert n_components == 1, f'MST is disconnected into {n_components} components'
+
+    #not symmetric
+    assert np.all(mst == mst.T), 'Proposed MST adjacency matrix is not symmetric'
+
+    #num edges not valid (not n_vertices - 1)
+    num_vertices = len(adj_mat)
+    num_edges = len(mst.nonzero()[1])/2 #count the # nonzero elements (edge weights), then divide by 2 bc it should be symmetric
+    assert num_edges == num_vertices-1, f'Proposed MST does not have the correct number of edges {num_vertices-1}'
+
+
+    #ASSIGNMENT ASSERTION
     def approx_equal(a, b):
         return abs(a - b) < allowed_error
 
@@ -33,7 +50,9 @@ def check_mst(adj_mat: np.ndarray,
     for i in range(mst.shape[0]):
         for j in range(i+1):
             total += mst[i, j]
-    assert approx_equal(total, expected_weight), 'Proposed MST has incorrect expected weight'
+    assert approx_equal(total, expected_weight), f'Proposed MST has incorrect expected weight: was expecting {expected_weight}, got {total}'
+
+    
 
 
 def test_mst_small():
@@ -68,7 +87,10 @@ def test_mst_single_cell_data():
 def test_mst_student():
     """
     
-    TODO: Write at least one unit test for MST construction.
+    Unit test for the construction of a minimum spanning tree on a graph that is disconnected (has two separate subgraphs).
     
     """
-    pass
+    file_path = './data/disconnected.csv'
+    g = Graph(file_path)
+    g.construct_mst()
+    check_mst(g.adj_mat, g.mst, 1)

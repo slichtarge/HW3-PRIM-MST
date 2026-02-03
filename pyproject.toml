@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prim-mst"
+version = "0.1.0"
+authors = [
+  { name="Sara Lichtarge", email="sara.lichtarge@ucsf.edu" },
+]
+description = "A project implementing Prim's algorithm for MST"
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "scipy",
+    "pytest"
+]
+
+[tool.setuptools]
+packages = ["mst"]
